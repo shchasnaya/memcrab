@@ -8,7 +8,7 @@ const HeaderColumn = () => {
 
   return (
       <tr>
-        <td>&nbsp;</td>
+        <HeaderCell name={""} />
         {matrixHeader.map((item, index) => <HeaderCell key={index} name={item}/>)}
       </tr>
   );

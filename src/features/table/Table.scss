@@ -1,8 +1,7 @@
 .table {
-  display: block;
-  margin: 0 auto;
-  table-layout: fixed;
-  width: 1140px;
-  max-height: 610px;
-  overflow: scroll;
+  overflow: auto;
+  &_align {
+    margin: 20px auto 0 auto;
+    max-height: 610px;
+  }
 }

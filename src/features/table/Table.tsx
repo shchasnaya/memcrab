@@ -27,10 +27,10 @@ const Table = () => {
   const [hoverCell, setHoverCell] = useState(false);
 
   return (
-      <>
+      <div className="table">
         {matrix.length > 0
             ?
-            <table className="table">
+            <table className="table_align">
               <thead>
               <HeaderCellColumn/>
               </thead>
@@ -79,7 +79,7 @@ const Table = () => {
             :
             null
         }
-      </>
+      </div>
   );
 };
 
