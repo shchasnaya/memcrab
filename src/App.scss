@@ -1,0 +1,10 @@
+@import "style/variables";
+
+* {
+  background: $background-color;
+}
+
+.container {
+  margin: 0 auto;
+  width: 1140px;
+}

@@ -1,0 +1,22 @@
+@import "src/style/variables";
+
+.button {
+  height: 46px;
+  background: #BDC3F5;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  &_create {
+    width: 180px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+    background: $background-create-color;
+  }
+  &_add {
+    min-width: 140px;
+    background: $background-add-color;
+  }
+  &_delete {
+    min-width: 140px;
+    background: $background-delete-color;
+  }
+}

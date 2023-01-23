@@ -1,0 +1,36 @@
+@import "src/style/variables";
+
+.form {
+  display: flex;
+  justify-content: space-between;
+  width: 1100px;
+  margin-top: 20px;
+  &__label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 180px;
+    height: 46px;
+    background: $background-main-color;
+    border-radius: 2px;
+    color: $main-color;
+    font-weight: 500;
+    font-size: 22px;
+  }
+  &__input {
+    width: 272px;
+    height: 44px;
+    background: $background-main-color;
+    border: 1px solid rgba(67, 63, 71, 0.2);
+    border-radius: 2px;
+    color: $grey-color;
+    font-weight: 400;
+    font-size: 22px;
+  }
+  &__x {
+    display: flex;
+    justify-content: space-between;
+    width: 459px;
+    margin-top: 20px;
+  }
+}

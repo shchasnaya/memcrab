@@ -1,0 +1,30 @@
+@import "src/style/variables";
+
+.cell {
+  background: $background-main-color;
+  border-radius: 2px;
+  font-size: 18px;
+  text-align: center;
+  color: $grey-color;
+
+  &__item {
+    &_hover {
+      background-color: $background-hover-cell-color;
+    }
+
+    &_percent {
+      background-image: repeating-linear-gradient(180deg, #E0EFEA 0%, #BDC3F5 100%);
+    }
+  }
+
+  &__header {
+    min-width: 140px;
+    min-height: 46px;
+    border-radius: 2px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 26px;
+    text-align: center;
+    color: $main-color;
+  }
+}
