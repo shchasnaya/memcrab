@@ -15,11 +15,13 @@ type Input = {
   x: number
 }
 
-type context = {
+type Context = {
   matrixHeader: ArrayString,
   summary: ArrayNumber,
   average: ArrayNumber,
   percent: ArrayNumber,
+  rowForShowPercent: number,
+  cellForShowClosetValue: Cell,
   closetValue: Cell[],
   matrix: Array<Array<Cell>>,
   inputs: Input,
@@ -27,28 +29,33 @@ type context = {
   changeMatrix: () => void,
   changeCell: (row: number, column: number) => void,
   deleteRow: (row: number) => void,
-  changePercent: (row: number) => void,
-  changeClosetValue: (amount: number, id: number) => void,
+  changeCellForShowClosetValue: (cell: Cell) => void,
+  changeRowForShowPercent: (row: number) => void,
   addRow: () => void
 }
 
-export const initialValue: context = {
+export const initialValue: Context = {
   matrixHeader: [],
-  matrix: [],
+  matrix: [[]],
   summary: [],
   average: [],
   percent: [],
   closetValue: [],
+  rowForShowPercent: -1,
+  cellForShowClosetValue: {
+    id: -1,
+    amount: 0
+  },
   inputs: {
     m: 0,
     n: 0,
-    x: 0
+    x: 1
   },
   changeInputs: () => {},
   changeMatrix: () => {},
   changeCell: () => {},
   deleteRow: () => {},
-  changePercent: () => {},
-  changeClosetValue: () => {},
+  changeRowForShowPercent: () => {},
+  changeCellForShowClosetValue: () => {},
   addRow: () => {}
 }

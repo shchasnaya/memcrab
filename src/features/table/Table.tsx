@@ -17,18 +17,18 @@ const Table = () => {
     changeCell,
     deleteRow,
     addRow,
-    changePercent,
-    changeClosetValue
+    rowForShowPercent,
+    changeCellForShowClosetValue,
+    changeRowForShowPercent
   } = useContext(Context);
 
   const {cell, button} = localization;
 
-  const [showPercent, setShowPercent] = useState(-1);
   const [hoverCell, setHoverCell] = useState(false);
 
   return (
       <div className="table">
-        {matrix.length > 0
+        {matrix[0].length > 0
             ?
             <table className="table_align">
               <thead>
@@ -42,28 +42,29 @@ const Table = () => {
                         <Cell
                             hover={hoverCell}
                             onMouseEnter={() => {
-                              changeClosetValue(cell.amount, cell.id)
+                              changeCellForShowClosetValue(cell)
                               setHoverCell(true)
                             }}
                             onMouseLeave={() => setHoverCell(false)}
-                            percent={showPercent === rowIndex ? percent[columnIndex] : -1}
+                            percent={rowForShowPercent === rowIndex ? percent[columnIndex] : -1}
                             key={cell.id}
                             cell={cell}
                             onPress={() => changeCell(rowIndex, columnIndex)}/>
                     ))}
                     <SumCell
                         onMouseEnter={() => {
-                          setShowPercent(rowIndex);
-                          changePercent(rowIndex);
+                          changeRowForShowPercent(rowIndex);
                         }}
-                        onMouseLeave={() => setShowPercent(-1)}
+                        onMouseLeave={() => changeRowForShowPercent(-1)}
                         key={`Summary${rowIndex}`}
-                        name={String(summary[rowIndex])}
+                        name={(summary[rowIndex]).toString()}
                     />
-                    <Button key={`Delete${rowIndex}`}
-                            onPress={() => deleteRow(rowIndex)}
-                            name={button.delete}
-                            className={"delete"}/>
+                    <td>
+                      <Button key={`Delete${rowIndex}`}
+                              onPress={() => deleteRow(rowIndex)}
+                              name={button.delete}
+                              className={"delete"}/>
+                    </td>
                   </tr>
               ))}
               <AverageCell/>

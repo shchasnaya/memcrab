@@ -14,9 +14,9 @@ const Form = () => {
     const value = +event.target.value;
     if (name === "x") {
       const multiplication = inputs.n * inputs.m
-      if(multiplication === 0 || multiplication <= value) {
-        alert(`Value must be less than ${multiplication}`)
-      } else changeInputs(name, value);
+      if(multiplication === 0 || multiplication <= value) alert(`Max value for X: ${multiplication - 1}`)
+      else if (value < 1) alert('Min value for X: 1')
+      else changeInputs(name, value);
     } else changeInputs(name, value)
   }
 
@@ -56,7 +56,7 @@ const Form = () => {
               className="form__input"
               type="number"
               name="x"
-              min={0}
+              min={1}
               value={inputs.x}
               onChange={handleChange}
           />

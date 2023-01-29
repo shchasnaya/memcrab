@@ -1,4 +1,4 @@
-import {createContext, FC, ReactNode, useEffect, useState} from 'react';
+import {createContext, FC, ReactNode, useMemo, useState} from 'react';
 import {Cell, initialValue} from "../model/Model";
 import {localization} from "../localization/Localization";
 
@@ -9,22 +9,18 @@ type Props = {
 };
 
 const Provider: FC<Props> = ({children}) => {
-  const [matrixHeader, setMatrixHeader] = useState(initialValue.matrixHeader);
-  const [matrix, setMatrix] = useState(initialValue.matrix);
   const [inputs, setInputs] = useState(initialValue.inputs);
-  const [summary, setSummary] = useState(initialValue.summary);
-  const [average, setAverage] = useState(initialValue.average);
-  const [percent, setPercent] = useState(initialValue.percent);
-  const [closetValue, setClosetValue] = useState(initialValue.closetValue);
+  const [matrix, setMatrix] = useState(initialValue.matrix);
+  const [rowForShowPercent, setRowForShowPercent] = useState(initialValue.rowForShowPercent);
+  const [cellForShowClosetValue, setCellForShowClosetValue] = useState(initialValue.cellForShowClosetValue);
   const [idCell, setIdCell] = useState(1);
-  const [refresh, setRefresh] = useState(false);
 
-  const {cell} = localization;
+  const matrixHeader = useMemo(() => changeMatrixHeader(matrix[0].length), [matrix[0].length]);
+  const summary = useMemo(() => sumValues(matrix), [matrix]);
+  const average = useMemo(() => averageValues(matrix), [matrix]);
+  const percent = useMemo(() => changePercent(rowForShowPercent), [rowForShowPercent]);
+  const closetValue = useMemo(() => changeClosetValue(cellForShowClosetValue), [cellForShowClosetValue, inputs.x]);
 
-  useEffect(() => {
-    averageValues();
-    sumValues();
-  }, [matrix.length, refresh]);
 
   const changeInputs = (name: string, value: number) => {
     setInputs(values => ({...values, [name]: value}));
@@ -41,17 +37,10 @@ const Provider: FC<Props> = ({children}) => {
     }));
     setIdCell(0);
     setMatrix(matrix.splice(0, 100, ...newMatrix));
-    setRefresh(() => !refresh);
   }
 
   const changeMatrix = () => {
     resetMatrix();
-
-    setMatrixHeader(Array(inputs.n + 2).fill("").map((item, index) => {
-      if (index === inputs.n) return cell.summary;
-      else if (index === inputs.n + 1) return cell.actions;
-      else return `${cell.n}${index + 1}`;
-    }))
 
     let counter = 0;
     setMatrix(matrix.map((column,) => {
@@ -74,41 +63,10 @@ const Provider: FC<Props> = ({children}) => {
       })
       else return item
     }))
-    setSummary(summary.map((item, index) => {
-      if (index === row) return item + 1
-      else return item
-    }))
-    setAverage(average.map((item, index) => {
-      if (index === column) return Math.floor((item * inputs.m + 1) / inputs.m * 10) / 10;
-      else return item
-    }))
-  }
-
-  const sumValues = () => {
-    let newSummary: number[] = [];
-    matrix.forEach((column) => {
-      let sum = column.reduce((acc, prev) => acc + prev.amount, 0)
-      newSummary.push(sum)
-    })
-    setSummary(newSummary)
-  }
-
-  const averageValues = () => {
-    let sum = 0;
-    let newAverage: number[] = []
-    for (let i = 0; i < inputs.n; i++) {
-      sum = 0;
-      for (let j = 0; j < inputs.m; j++) {
-        sum = sum + matrix[j][i].amount;
-      }
-      newAverage.push(Math.floor(sum / inputs.m * 10) / 10)
-    }
-    setAverage(newAverage)
   }
 
   const deleteRow = (row: number) => {
     setMatrix(matrix.filter((item, index) => row !== index));
-    setSummary(summary.filter((item, index) => row !== index))
     changeInputs("m", inputs.m - 1)
   }
 
@@ -127,20 +85,61 @@ const Provider: FC<Props> = ({children}) => {
     changeInputs("m", inputs.m + 1)
   }
 
-  const changePercent = (row: number) => {
-    let newPercent: number[] = [];
-    matrix[row].forEach((item) => {
-      newPercent.push(Math.round(item.amount * 100 / summary[row]))
-    })
-    setPercent(newPercent)
+  const changeRowForShowPercent = (row: number) => {
+    setRowForShowPercent(row);
   }
 
-  const changeClosetValue = (amount: number, id: number) => {
-    if (inputs.x > 0) {
+  const changeCellForShowClosetValue = (cell: Cell) => {
+    setCellForShowClosetValue(cell)
+  }
+
+  function changeMatrixHeader(lengthRow: number) {
+    return Array(lengthRow + 2).fill("").map((item, index) => {
+      if (index === lengthRow) return localization.cell.summary;
+      else if (index === lengthRow + 1) return localization.cell.actions;
+      else return `${localization.cell.n}${index + 1}`;
+    })
+  }
+
+  function averageValues(matrix: Array<Array<Cell>>) {
+    let sum = 0;
+    let newAverage: number[] = []
+    for (let i = 0; i < matrix[0].length; i++) {
+      sum = 0;
+      for (let j = 0; j < matrix.length; j++) {
+        sum = sum + matrix[j][i].amount;
+      }
+      newAverage.push(Math.floor(sum / matrix.length * 10) / 10)
+    }
+    return newAverage;
+  }
+
+  function sumValues(matrix: Array<Array<Cell>>) {
+    let newSummary: number[] = [];
+    matrix.forEach((column) => {
+      let sum = column.reduce((acc, prev) => acc + prev.amount, 0)
+      newSummary.push(sum)
+    })
+    return newSummary
+  }
+
+  function changePercent(row: number) {
+    if (row === -1) return []
+    else {
+      let newPercent: number[] = [];
+      matrix[row].forEach((item) => {
+        newPercent.push(Math.round(item.amount * 100 / summary[row]))
+      })
+      return newPercent;
+    }
+  }
+
+  function changeClosetValue(cell: Cell) {
+    if (cell.id !== -1) {
       let newArray: Array<Cell> = [];
       for (let i = 0; i < inputs.m; i++) {
         for (let j = 0; j < inputs.n; j++) {
-          if (matrix[i][j].id !== id) {
+          if (matrix[i][j].id !== cell.id) {
             if (newArray.length < inputs.x) {
               newArray.push({
                 id: matrix[i][j].id,
@@ -151,9 +150,9 @@ const Provider: FC<Props> = ({children}) => {
               newArray.sort((a, b) => {
                 return a.amount - b.amount;
               });
-              const differentWithAmount = Math.abs(matrix[i][j].amount - amount);
-              const differentWithFirstValueArrayAmount = Math.abs(newArray[0].amount - amount);
-              const differentWithLastValueArrayAmount = Math.abs(newArray[newArray.length - 1].amount - amount);
+              const differentWithAmount = Math.abs(matrix[i][j].amount - cell.amount);
+              const differentWithFirstValueArrayAmount = Math.abs(newArray[0].amount - cell.amount);
+              const differentWithLastValueArrayAmount = Math.abs(newArray[newArray.length - 1].amount - cell.amount);
               const minDifferent = Math.min(differentWithAmount, differentWithFirstValueArrayAmount, differentWithFirstValueArrayAmount);
               if (minDifferent === differentWithAmount) {
                 if (differentWithFirstValueArrayAmount > differentWithLastValueArrayAmount) {
@@ -172,8 +171,11 @@ const Provider: FC<Props> = ({children}) => {
           }
         }
       }
-      setClosetValue(newArray)
-    }
+      return newArray;
+    } else return [{
+      id: -1,
+      amount: 0
+    }]
   }
 
   return (
@@ -185,13 +187,15 @@ const Provider: FC<Props> = ({children}) => {
         average,
         percent,
         closetValue,
+        cellForShowClosetValue,
+        rowForShowPercent,
         changeInputs,
         changeMatrix,
         changeCell,
         deleteRow,
         addRow,
-        changePercent,
-        changeClosetValue
+        changeCellForShowClosetValue,
+        changeRowForShowPercent
       }}
       >
         {children}
